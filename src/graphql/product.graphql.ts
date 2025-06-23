@@ -27,7 +27,8 @@ export enum ProductSortField {
   Name = 'name',
   Price = 'price',
   Categories = 'categories',
-  Status = 'status'
+  Status = 'status',
+  Sku = 'sku'
 }
 registerEnumType(ProductSortField, {
   name: 'ProductSortField',
@@ -132,7 +133,7 @@ export class UpdateProductInput {
 @InputType()
 export class ProductSortInput {
     @Field(() => ProductSortField, {defaultValue: ProductSortField.CreatedAt})
-    field?: ProductSortField;
+    field!: ProductSortField;
 
     @Field(() => SortDirection, {defaultValue: SortDirection.DESC})
     direction?: SortDirection;

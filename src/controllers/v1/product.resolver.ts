@@ -17,6 +17,13 @@ export class ProductResolver {
         @Arg('offset', () => Int, { nullable: true }) offset: number,
         @Arg('sort', () => ProductSortInput, {nullable: true}) sort: ProductSortInput
     ): Promise<ProductListResponse | null>  {
-        return await this.productService.retrieveProducts(limit, offset)
+        return await this.productService.retrieveProducts(limit, offset, sort)
+    }
+
+    @Query(() => ProductSingleResponse, {nullable: true})
+    async retrieveSingleProduct(
+        @Arg('id') id: string
+    ): Promise<ProductSingleResponse | null> {
+        return await this.productService.retrieveSingleProduct(id)
     }
 }
