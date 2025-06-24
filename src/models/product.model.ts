@@ -11,7 +11,16 @@ export interface IProduct {
     images: string[];
     categories: string[];
     stock: number;
+    variants?: ProductVariant[];
     status: 'Published' | 'Draft' | 'Out stock';
+}
+
+export interface ProductVariant {
+    name?: string;
+    color?: string;
+    size?: string;
+    price?: Double;
+    image?: string;
 }
 
 export interface ProductDocument extends Document {
@@ -23,6 +32,13 @@ export interface ProductDocument extends Document {
     discount?: number;
     images: string[];
     categories: string[];
+    variants?: {
+        name?: string;
+        price?: number;
+        size?: string;
+        color?: string;
+        image?: string;
+    }[];
     status: ProductStatus;
     createdAt: Date;
     updatedAt?: Date;
@@ -56,6 +72,15 @@ const productSchema = new Schema<IProduct>({
     categories: {
         type: [String]
     },
+    variants: [
+        {
+            name: { type: String },
+            price: {  type: Schema.Types.Double, },
+            size: { type: String },
+            color: { type: String },
+            image: { type: String },
+        }
+    ],
     status: {
         type: String,
         required: true,

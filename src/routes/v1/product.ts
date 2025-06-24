@@ -1,5 +1,5 @@
 
-import { CreateProductInput } from "@/graphql/product.graphql";
+import { CreateProductInput, UpdateProductInput } from "@/graphql/product.graphql";
 import { ProductService } from "@/services/product.service";
 import { Router } from "express";
 import type { Request, Response } from 'express';
@@ -11,7 +11,7 @@ const productService = new ProductService();
 
 router.post('/', async(req: Request, res: Response) => {
 
-    const input = req.body
+    const input: CreateProductInput = req.body
 
     const product = await productService.createProduct(input);
 
@@ -25,9 +25,18 @@ router.post('/', async(req: Request, res: Response) => {
 });
 
 router.patch('/:id', async(req: Request, res: Response) => {
-    const input = req.body
-    const {id} = req.params
+    const input: UpdateProductInput = req.body
+    const {id} = req.params;
+
     const product = await productService.updateProduct(id, input);
+
+    if(!product || !product.data) {
+        res.status(500).json({
+        code: 1,
+        status: "INTERNL_SERVER_ERROR",
+        msg: "Unsuccessfully updated!"
+    })
+    }
 
     res.status(200).json({
         code: 0,

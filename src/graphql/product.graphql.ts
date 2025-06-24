@@ -60,6 +60,9 @@ export class ProductBase {
     
     @Field(() => [String])
     categories!: string[]
+
+    @Field(() => [ProductVariant], {nullable: true})
+    variants?: ProductVariant[] | null;
     
     @Field(() => ProductStatus, {defaultValue: ProductStatus.Published})
     status!: ProductStatus;
@@ -69,6 +72,25 @@ export class ProductBase {
 
     @Field(() => Date, {nullable: true})
     updatedAt?: Date;    
+}
+
+
+@ObjectType()
+export class ProductVariant {
+  @Field(() => String, {nullable: true})
+  name?: string | null;
+
+  @Field(() => Float)
+  price!: number;
+
+  @Field(() => String, {nullable: true})
+  size?: string | null;
+
+  @Field(() => String, {nullable: true})
+  color?: string | null;
+
+  @Field(() => String, {nullable: true})
+  image?: string | null;
 }
 
 
@@ -86,14 +108,17 @@ export class CreateProductInput {
     @Field(() => Float)
     price!: number;
 
-    @Field(()=> Float)
+    @Field(()=> Float, {nullable: true})
     discount?: number;
 
     @Field(() => [String])
-    images!: string[]
+    images!: string[];
     
     @Field(() => [String])
-    categories!: string[]
+    categories!: string[];
+
+    @Field(() => [ProductVariant], {nullable: true})
+    variants?: ProductVariant[];
     
     @Field(() => ProductStatus, {defaultValue: ProductStatus.Published})
     status!: ProductStatus;
@@ -120,7 +145,10 @@ export class UpdateProductInput {
     images?: string[]
     
     @Field(() => [String], {nullable: true})
-    categories?: string[]
+    categories?: string[];
+
+    @Field(() => [ProductVariant])
+    variants?: ProductVariant[];
     
     @Field(() => ProductStatus, {defaultValue: ProductStatus.Published, nullable: true})
     status?: ProductStatus;

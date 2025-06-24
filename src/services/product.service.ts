@@ -1,6 +1,6 @@
 
 import Product, { ProductDocument } from '@/models/product.model'
-import { CreateProductInput, ProductBase, ProductListResponse, ProductSingleResponse, ProductSortInput, ProductStatus, SortDirection, UpdateProductInput } from "@/graphql/product.graphql";
+import { CreateProductInput, ProductBase, ProductListResponse, ProductSingleResponse, ProductSortInput, ProductStatus, ProductVariant, SortDirection, UpdateProductInput } from "@/graphql/product.graphql";
 import { logger } from "@/libs/winston";
 import generateProductSku from '@/utils/productIdGenerator';
 import { FlattenMaps } from 'mongoose';
@@ -15,6 +15,13 @@ export class ProductService {
             const newProduct = await Product.create({
                 ...input,
                 sku,
+                varients: input.variants?.map((variant): ProductVariant => ({
+                    name: variant.name,
+                    price: variant.price,
+                    size: variant.size,
+                    color: variant.color,
+                    image: variant.image,
+                })), 
                 createdAt: new Date(),
                 updatedAt: new Date()
             });
@@ -27,7 +34,11 @@ export class ProductService {
 
             const mappedProduct: ProductBase = {
                 ...product,
-                id: product._id.toString()
+                id: product._id.toString(),
+                variants: product.variants?.map((variant) => ({
+                    ...variant,
+                    price: Number(variant.price) 
+                }))
             }
             
             return {data: mappedProduct}
@@ -52,8 +63,13 @@ export class ProductService {
             .lean<FlattenMaps<ProductDocument>[]>();
 
             const mappedProducts: ProductBase[] = products.map((product): ProductBase => ({
-            id: product._id.toString(),
-            ...product}));
+                ...product,
+                id: product._id.toString(),
+                variants: product.variants?.map((variant): ProductVariant => ({
+                    ...variant,
+                    price: Number(variant.price)
+                }))
+            }));
 
             return {
                 data: mappedProducts
@@ -75,7 +91,11 @@ export class ProductService {
 
             const mappedProduct: ProductBase = {
                 ...product,
-                id: product._id.toString()
+                id: product._id.toString(),
+                variants: product.variants?.map((variant): ProductVariant => ({
+                    ...variant,
+                    price: Number(variant.price) 
+                })) || null
             }
             
             return {data: mappedProduct}
@@ -93,7 +113,9 @@ export class ProductService {
             if(!id) {
                 return null
             }
-            await Product.findByIdAndUpdate(id, {...input});
+            await Product.findByIdAndUpdate(id, {
+                ...input
+            });
 
 
             const product =  await Product.findById(id).select('-__v').lean<FlattenMaps<ProductDocument>>();
@@ -104,11 +126,16 @@ export class ProductService {
 
             const mappedProduct: ProductBase = {
                 ...product,
-                id: product._id.toString()
+                id: product._id.toString(),
+                variants: product.variants?.map((variant): ProductVariant => ({
+                    ...variant,
+                    price: Number(variant.price) 
+                }))
             }
             
             return {data: mappedProduct}
         } catch (error) {
+            logger.error(`Error while updating a product.`, error);
             return null;
         }
     }
